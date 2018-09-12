@@ -4,7 +4,7 @@ import cats.effect.IO
 import cats.implicits._
 import org.http4s.client.blaze.{Http1Client}
 
-import com.github.plippe.news.scrapy.parsers._
+import com.github.plippe.news.scrapy.pages._
 
 object Main extends App { // IOApp {
   trait ExitCode
@@ -16,8 +16,7 @@ object Main extends App { // IOApp {
     val stream = for {
       client <- Http1Client.stream[IO]()
 
-      independentIeArticlesUri <- IndependentIeArticleListPageParser.parseWith(
-        client)
+      independentIeArticlesUri <- IndependentIeArticleList.stream[IO](client)
       _ = println(
         s"IndependentIeArticleListPageParser - $independentIeArticlesUri")
     } yield ()
