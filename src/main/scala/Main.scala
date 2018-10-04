@@ -5,8 +5,8 @@ import cats.implicits._
 import org.http4s.client.blaze.Http1Client
 import org.http4s.Uri
 
-import com.github.plippe.news.scrapy.models.Source
-import com.github.plippe.news.scrapy.fetchers.HttpFetcher
+import com.github.plippe.news.scrapy.models.Link
+import com.github.plippe.news.scrapy.stores.HttpStore
 import com.github.plippe.news.scrapy.parsers.IndependentIeArticleListParser
 
 object Main extends App { // IOApp {
@@ -19,8 +19,8 @@ object Main extends App { // IOApp {
     val stream = for {
       client <- Http1Client.stream[IO]()
 
-      req = Source.Http(Uri.uri("https://www.independent.ie/news/"))
-      document <- new HttpFetcher[IO](client).fetch(req)
+      link = Link.Http(Uri.uri("https://www.independent.ie/news/"))
+      document <- new HttpStore[IO](client).read(link)
       uris <- new IndependentIeArticleListParser[IO]().parse(document)
       _ = println(s"IndependentIeArticleListPageParser - $uris")
     } yield ()
