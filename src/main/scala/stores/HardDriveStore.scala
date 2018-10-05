@@ -5,19 +5,19 @@ import fs2.Stream
 import java.io.{File, PrintWriter}
 import scala.io.Source
 
-import com.github.plippe.news.scrapy.models.Link.HardDrive
+import com.github.plippe.news.scrapy.models.Link
 
 class HardDriveStore[F[_]](implicit F: ApplicativeError[F, Throwable])
-    extends Reader[F, HardDrive]
-    with Writer[F, HardDrive] {
+    extends Reader[F, Link.HardDrive]
+    with Writer[F, Link.HardDrive] {
 
-  def read(link: HardDrive): Stream[F, String] = Stream.eval {
+  def read(link: Link.HardDrive): Stream[F, String] = Stream.eval {
     F.catchNonFatal {
       Source.fromFile(link.path).getLines.mkString("\n")
     }
   }
 
-  def write(link: HardDrive, document: String): Stream[F, HardDrive] =
+  def write(link: Link.HardDrive, document: String): Stream[F, Link.HardDrive] =
     Stream.eval {
       F.catchNonFatal {
         val writer = new PrintWriter(new File(link.path))
