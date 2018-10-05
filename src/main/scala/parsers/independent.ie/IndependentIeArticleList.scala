@@ -9,10 +9,11 @@ import org.jsoup.Jsoup
 
 class IndependentIeArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
     extends Parser[F, Uri] {
+
   def parse(content: String): Stream[F, Uri] = {
     val uris: F[List[Uri]] = Jsoup
       .parse(content)
-      .select("article a")
+      .select("article a[href]")
       .eachAttr("abs:href")
       .asScala
       .toList
@@ -27,4 +28,5 @@ class IndependentIeArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
 
     Stream.eval(uris).flatMap(uris => Stream.apply(uris: _*))
   }
+
 }
