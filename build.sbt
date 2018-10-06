@@ -2,6 +2,9 @@ scalaVersion := "2.12.7"
 
 scalafmtOnCompile := true
 
+lazy val app = project
+    .dependsOn(core)
+
 lazy val core = project
     .settings(
         libraryDependencies ++= Seq(
