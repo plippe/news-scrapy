@@ -3,7 +3,7 @@ package com.github.plippe.news.scrapy.models
 import com.amazonaws.services.s3.AmazonS3URI
 import org.http4s.Uri
 
-trait Link
+sealed trait Link
 
 object Link {
   case class AmazonS3(uri: AmazonS3URI) extends Link

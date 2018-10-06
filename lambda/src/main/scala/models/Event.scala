@@ -1,6 +1,6 @@
 package com.github.plippe.news.scrapy.models
 
-trait Event
+sealed trait Event
 
 object Event {
   case class FetchDocument(source: Link) extends Event

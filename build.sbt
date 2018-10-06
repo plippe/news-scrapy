@@ -15,3 +15,15 @@ lazy val core = project
 
         addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7")
     )
+
+lazy val lambda = project
+    .dependsOn(core)
+    .settings(
+        libraryDependencies ++= Seq(
+            "com.amazonaws" % "aws-lambda-java-core" % "1.2.0",
+            "io.circe" %% "circe-generic" % "0.9.3",
+            "io.circe" %% "circe-parser" % "0.9.3"
+        )
+    )
+    .enablePlugins(AwsLambdaPlugin)
+    .settings(awsLambdaFunctionName := "news-scrapy")
