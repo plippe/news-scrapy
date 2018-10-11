@@ -1,14 +1,13 @@
 package com.github.plippe.news.scrapy
 
-import cats.effect.{IO, Effect}
+import cats.effect.{Effect, IO}
 import cats.implicits._
-import com.amazonaws.services.s3.{AmazonS3ClientBuilder, AmazonS3URI}
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import org.http4s.client.blaze.Http1Client
 import org.http4s.Uri
-
 import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
-import com.github.plippe.news.scrapy.parsers._
+import parsers.{IrishExaminerArticleListParser, _}
 
 object Main extends App { // IOApp {
   trait ExitCode
@@ -23,35 +22,44 @@ object Main extends App { // IOApp {
       amazonS3Store = new AmazonS3Store[F](
         AmazonS3ClientBuilder.defaultClient())
 
-      _ = println("Read independent.ie from HTTP")
-      articleListSourceHttpUri = Uri.uri("https://www.independent.ie/news/")
+      hardDriveStore = new HardDriveStore[F]
+
+      newsUrl = "https://www.irishexaminer.com/"
+      directory = "irishexaminer"
+      rootFile = "news.html"
+
+
+      _ = println("Read from HTTP")
+      articleListSourceHttpUri = Uri.uri("https://www.irishexaminer.com/")
       articleListSourceHttpLink = Link.Http(articleListSourceHttpUri)
       articleListSourceHttp <- httpStore.read(articleListSourceHttpLink)
 
-      _ = println("Write independent.ie to Amazon S3")
-      articleListAmazonS3Uri = new AmazonS3URI(
-        s"s3://plippe-us-east-1/independent.ie/news/index.html")
-      articleListAmazonS3Link = Link.AmazonS3(articleListAmazonS3Uri)
-      _ <- amazonS3Store.write(articleListAmazonS3Link, articleListSourceHttp)
+      _ = println(s"Write to Hard Drive - $newsUrl")
+      /*articleListAmazonS3Uri = new AmazonS3URI(
+        s"s3://plippe-us-east-1/independent.ie/news/index.html")*/
+      articleListHardDriveLink = Link.HardDrive(s"$directory/$rootFile")
+      _ <- hardDriveStore.write(articleListHardDriveLink, articleListSourceHttp)
 
-      _ = println("Read independent.ie from Amazon S3")
-      articleList <- amazonS3Store.read(articleListAmazonS3Link)
+      _ = println(s"Read from Hard Drive - $directory/$rootFile")
+      articleList <- hardDriveStore.read(articleListHardDriveLink)
 
-      _ = println("Parse independent.ie for URIs")
-      articleUri <- new IndependentIeArticleListParser[F]().parse(articleList)
+      _ = println(s"Parse $newsUrl for URIs")
+      articleUri <- new IrishExaminerArticleListParser[F]().parse(articleList)
       articleLink = Link.Http(articleUri)
 
       _ = println(s"Read ${articleUri} from HTTP")
       article <- httpStore.read(articleLink)
 
       _ = println(s"Write ${articleUri} to Amazon S3")
-      articleAmazonS3Uri = new AmazonS3URI(
-        s"s3://plippe-us-east-1/independent.ie${articleUri.path}")
-      articleAmazonS3Link = Link.AmazonS3(articleAmazonS3Uri)
-      _ <- amazonS3Store.write(articleAmazonS3Link, article)
+      /*articleAmazonS3Uri = new AmazonS3URI(
+        s"s3://plippe-us-east-1/independent.ie${articleUri.path}")*/
+      articleHardDriveLink = Link.HardDrive(s"$directory/${articleUri.path}")
+      _ <- hardDriveStore.write(articleHardDriveLink, article)
 
       _ = println(s"Parse ${articleUri}")
-      document <- new IndependentIeArticleParser[F]().parse(article)
+      document <- new GenericArticleParser[F]().parse(article)
+
+      _ = println(s"Done ${document}")
 
       _ = println(s"Done ${articleUri}")
     } yield ()
