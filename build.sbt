@@ -2,10 +2,13 @@ scalaVersion := "2.12.7"
 
 scalafmtOnCompile := true
 
-lazy val app = project
-    .dependsOn(core)
+lazy val commonSettings = Seq(
+    libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.5" % "test",
+    testFrameworks += new TestFramework("utest.runner.Framework"),
+)
 
 lazy val core = project
+    .settings(commonSettings)
     .settings(
         libraryDependencies ++= Seq(
             "com.amazonaws" % "aws-java-sdk-s3" % "1.11.408",
@@ -13,10 +16,16 @@ lazy val core = project
             "org.jsoup" % "jsoup" % "1.11.3"
         ),
 
+
         addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7")
     )
 
+lazy val app = project
+    .settings(commonSettings)
+    .dependsOn(core)
+
 lazy val lambda = project
+    .settings(commonSettings)
     .dependsOn(core)
     .settings(
         libraryDependencies ++= Seq(
