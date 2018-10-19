@@ -21,10 +21,7 @@ class HardDriveStore[F[_]](implicit F: ApplicativeError[F, Throwable])
     Stream.eval {
       F.catchNonFatal {
 
-        val fileRoot = new File(new File(link.path).getParent()).mkdirs()
-        locally(fileRoot)
-        val file = new File(link.path)
-        locally(file)
+        new File(new File(link.path).getParent()).mkdirs()
         val writer = new PrintWriter(new File(link.path))
         writer.write(document)
         writer.close()

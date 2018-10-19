@@ -9,7 +9,7 @@ import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
 import com.github.plippe.news.scrapy.parsers.examiner._
 
-object Main extends App { // IOApp {
+object Main extends App {
   trait ExitCode
   object ExitCode {
     case object Success extends ExitCode
@@ -28,7 +28,6 @@ object Main extends App { // IOApp {
       directory = "irishexaminer"
       rootFile = "news.html"
 
-
       _ = println("Read from HTTP")
       articleListSourceHttpUri = Uri.uri("https://www.irishexaminer.com/")
       articleListSourceHttpLink = Link.Http(articleListSourceHttpUri)
@@ -44,20 +43,18 @@ object Main extends App { // IOApp {
       articleList <- hardDriveStore.read(articleListHardDriveLink)
 
       _ = println(s"Parse $newsUrl for URIs")
-      articleUri <- new IrishExaminerArticleListParser[F]().parse(articleList)
+      articleUri <- new IrishExaminerComArticleListParser[F]().parse(articleList)
       articleLink = Link.Http(articleUri)
 
       _ = println(s"Read ${articleUri} from HTTP")
       article <- httpStore.read(articleLink)
 
       _ = println(s"Write ${articleUri} to Amazon S3")
-      /*articleAmazonS3Uri = new AmazonS3URI(
-        s"s3://plippe-us-east-1/independent.ie${articleUri.path}")*/
       articleHardDriveLink = Link.HardDrive(s"$directory/${articleUri.path}")
       _ <- hardDriveStore.write(articleHardDriveLink, article)
 
       _ = println(s"Parse ${articleUri}")
-      document <- new IrishExaminerArticleParser[F]().parse(article)
+      document <- new IrishExaminerComArticleParser[F]().parse(article)
 
       _ = println(s"Done ${document}")
 
