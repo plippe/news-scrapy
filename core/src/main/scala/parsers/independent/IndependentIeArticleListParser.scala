@@ -15,11 +15,10 @@ class IndependentIeArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
   def parse(content: String): Stream[F, Uri] = {
     val uris: F[List[Uri]] = Jsoup
       .parse(content)
-      .select(".additional-block-dashboard a[href]")
+      .select("article a[href]")
       .eachAttr("href")
       .asScala
       .toList
-      .map(relativeUrl => "https://www.irishexaminer.com" + relativeUrl)
       .traverse { str =>
         val uri = Uri
           .fromString(str)

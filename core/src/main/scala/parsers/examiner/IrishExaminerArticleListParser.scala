@@ -17,7 +17,7 @@ class IrishExaminerArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
   def parse(content: String): Stream[F, Uri] = {
     val uris: F[List[Uri]] = Jsoup
       .parse(content)
-      .select("article a[href]")
+      .select(".additional-block-dashboard a[href]")
       .eachAttr("href")
       .asScala
       .toList
