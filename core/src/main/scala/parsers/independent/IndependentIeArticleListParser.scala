@@ -1,11 +1,13 @@
-package com.github.plippe.news.scrapy.parsers
+package com.github.plippe.news.scrapy.parsers.independent
 
 import cats.ApplicativeError
 import cats.implicits._
-import collection.JavaConverters._
+import com.github.plippe.news.scrapy.parsers.Parser
 import fs2.Stream
 import org.http4s.Uri
 import org.jsoup.Jsoup
+
+import scala.collection.JavaConverters._
 
 class IndependentIeArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
     extends Parser[F, Uri] {

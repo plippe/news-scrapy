@@ -3,7 +3,6 @@ package com.github.plippe.news.scrapy.stores
 import cats.ApplicativeError
 import fs2.Stream
 import java.io.{File, PrintWriter}
-//import java.nio.file.Files
 
 import scala.io.Source
 import com.github.plippe.news.scrapy.models.Link
@@ -24,7 +23,6 @@ class HardDriveStore[F[_]](implicit F: ApplicativeError[F, Throwable])
 
         val fileRoot = new File(new File(link.path).getParent()).mkdirs()
         locally(fileRoot)
-        //Files.createFile(link.path)
         val file = new File(link.path)
         locally(file)
         val writer = new PrintWriter(new File(link.path))

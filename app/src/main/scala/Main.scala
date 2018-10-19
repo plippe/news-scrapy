@@ -7,7 +7,7 @@ import org.http4s.client.blaze.Http1Client
 import org.http4s.Uri
 import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
-import parsers.{IrishExaminerArticleListParser, _}
+import com.github.plippe.news.scrapy.parsers.examiner._
 
 object Main extends App { // IOApp {
   trait ExitCode
@@ -57,7 +57,7 @@ object Main extends App { // IOApp {
       _ <- hardDriveStore.write(articleHardDriveLink, article)
 
       _ = println(s"Parse ${articleUri}")
-      document <- new GenericArticleParser[F]().parse(article)
+      document <- new IrishExaminerArticleParser[F]().parse(article)
 
       _ = println(s"Done ${document}")
 
