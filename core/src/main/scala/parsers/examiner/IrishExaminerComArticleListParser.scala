@@ -18,7 +18,7 @@ class IrishExaminerComArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]
     val uris: F[List[Uri]] = Jsoup
       .parse(content)
       .select(".additional-block-dashboard a[href]")
-      .eachAttr("href")
+      .eachAttr("abs:href")
       .asScala
       .toList
       .map(relativeUrl => baseUrl + relativeUrl)
