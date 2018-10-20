@@ -19,7 +19,8 @@ object Orchestrator {
     val awsLambdaClient = AWSLambdaClientBuilder.defaultClient()
     val awsLambdaTrigger = new AwsLambdaTrigger[F](awsLambdaClient)
 
-    trigger(awsLambdaTrigger, Task.IndependentIe)
+    trigger(awsLambdaTrigger, Task.IndependentIe) ++
+      trigger(awsLambdaTrigger, Task.IrishExaminerCom)
   }
 
 }
