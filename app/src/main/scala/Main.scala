@@ -7,7 +7,7 @@ import org.http4s.client.blaze.Http1Client
 import org.http4s.Uri
 import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
-import com.github.plippe.news.scrapy.parsers.examiner._
+import com.github.plippe.news.scrapy.parsers._
 
 object Main extends App {
   trait ExitCode

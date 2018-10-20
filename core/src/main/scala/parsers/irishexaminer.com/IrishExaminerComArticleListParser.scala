@@ -1,8 +1,7 @@
-package com.github.plippe.news.scrapy.parsers.examiner
+package com.github.plippe.news.scrapy.parsers
 
 import cats.ApplicativeError
 import cats.implicits._
-import com.github.plippe.news.scrapy.parsers.Parser
 import fs2.Stream
 import org.http4s.Uri
 import org.jsoup.Jsoup
@@ -11,7 +10,7 @@ import scala.collection.JavaConverters._
 
 class IrishExaminerComArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
   extends Parser[F, Uri] {
-  
+
   val baseUrl = "https://www.irishexaminer.com"
 
   def parse(content: String): Stream[F, Uri] = {

@@ -1,7 +1,6 @@
-package com.github.plippe.news.scrapy.parsers.examiner
+package com.github.plippe.news.scrapy.parsers
 
 import cats.ApplicativeError
-import com.github.plippe.news.scrapy.parsers.Parser
 import fs2.Stream
 import org.jsoup.Jsoup
 

@@ -1,8 +1,7 @@
-package com.github.plippe.news.scrapy.parsers.independent
+package com.github.plippe.news.scrapy.parsers
 
 import cats.ApplicativeError
 import cats.implicits._
-import com.github.plippe.news.scrapy.parsers.Parser
 import fs2.Stream
 import org.http4s.Uri
 import org.jsoup.Jsoup
