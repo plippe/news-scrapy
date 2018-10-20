@@ -11,7 +11,8 @@ class HttpStore[F[_]](client: Client[F]) extends Reader[F, Link.Http] {
   def read(link: Link.Http): Stream[F, String] = {
     val req = Request[F](uri = link.uri)
     client
-      .streaming(req)(_.bodyAsText)
+      .stream(req)
+      .flatMap(_.bodyAsText)
       .reduce(_ + _)
   }
 

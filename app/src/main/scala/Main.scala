@@ -1,10 +1,12 @@
 package com.github.plippe.news.scrapy
 
-import cats.effect.{Effect, IO}
+import cats.effect.{ConcurrentEffect, IO}
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import org.http4s.client.blaze.Http1Client
+import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.Uri
+import scala.concurrent.ExecutionContext
+
 import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
 import com.github.plippe.news.scrapy.parsers._
@@ -15,9 +17,9 @@ object Main extends App {
     case object Success extends ExitCode
   }
 
-  def run[F[_]: Effect](): F[ExitCode] = {
+  def run[F[_]: ConcurrentEffect]()(implicit ec: ExecutionContext): F[ExitCode] = {
     val stream = for {
-      client <- Http1Client.stream[F]()
+      client <- BlazeClientBuilder[F](ec).stream
       httpStore = new HttpStore[F](client)
       amazonS3Store = new AmazonS3Store[F](
         AmazonS3ClientBuilder.defaultClient())
@@ -64,5 +66,7 @@ object Main extends App {
     stream.compile.drain.as(ExitCode.Success)
   }
 
+  implicit val ec = ExecutionContext.global
+  implicit val cs = IO.contextShift(ec)
   run[IO]().unsafeRunSync()
 }
