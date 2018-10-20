@@ -1,13 +1,18 @@
 package com.github.plippe.news.scrapy
 
-import cats.effect.Effect
+import cats.effect.ConcurrentEffect
+import fs2.Stream
+import scala.concurrent.ExecutionContext
 
-sealed trait Task {
-    def run[F[_]: Effect](): F[Unit]
-}
+sealed trait Task
 
 object Task {
+    case object Orchestrator extends Task
 
-    case object IndependentIe extends Task with tasks.IndependentIe
+    case object IndependentIe extends Task
 
+    def stream[F[_] : ConcurrentEffect](task: Task)(implicit ec: ExecutionContext): Stream[F, Unit] = task match {
+        case Orchestrator => tasks.Orchestrator.stream[F]
+        case IndependentIe => tasks.IndependentIe.stream[F]
+    }
 }
