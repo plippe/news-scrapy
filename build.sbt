@@ -3,8 +3,7 @@ lazy val commonSettings = Seq(
     scalaVersion := "2.12.7",
     scalafmtOnCompile := true,
 
-    libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.5" % "test",
-    testFrameworks += new TestFramework("utest.runner.Framework"),
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )
 
 lazy val core = project
