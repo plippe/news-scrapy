@@ -36,7 +36,9 @@ object Main extends App {
       /*articleListAmazonS3Uri = new AmazonS3URI(
         s"s3://plippe-us-east-1/independent.ie/news/index.html")*/
       articleListHardDriveLink = Link.HardDrive(s"$directory/$rootFile")
-      _ <- hardDriveStore.write(articleListHardDriveLink, articleListSourceHttp).stream
+      _ <- hardDriveStore
+        .write(articleListHardDriveLink, articleListSourceHttp)
+        .stream
 
       _ = println(s"Read from Hard Drive - $directory/$rootFile")
       articleList <- hardDriveStore.read(articleListHardDriveLink).stream
@@ -45,7 +47,9 @@ object Main extends App {
       articleUri <- new IrishExaminerComArticleListParser[F]()
         .parse(articleList)
         .stream
-        .flatMap { uris => fs2.Stream.apply(uris: _*) }
+        .flatMap { uris =>
+          fs2.Stream.apply(uris: _*)
+        }
 
       articleLink = Link.Http(articleUri)
 

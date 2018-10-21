@@ -8,7 +8,7 @@ import org.jsoup.Jsoup
 import scala.collection.JavaConverters._
 
 class IrishExaminerComArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
-  extends Parser[F, List[Uri]] {
+    extends Parser[F, List[Uri]] {
 
   val baseUrl = "https://www.irishexaminer.com"
 

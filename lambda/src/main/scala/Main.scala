@@ -10,7 +10,9 @@ import scala.io.Source
 
 object Lambda extends RequestStreamHandler {
 
-  def handleRequest(inputStream: InputStream, outputStream: OutputStream, context: Context): Unit = {
+  def handleRequest(inputStream: InputStream,
+                    outputStream: OutputStream,
+                    context: Context): Unit = {
     val inputString = Source.fromInputStream(inputStream).mkString
 
     println(s"Start processing '${inputString}'")
@@ -25,8 +27,7 @@ object Lambda extends RequestStreamHandler {
         { err =>
           println(s"Failure processing '${inputString}'")
           throw err
-        },
-        { _ =>
+        }, { _ =>
           println(s"Success processing '${inputString}'")
         }
       )

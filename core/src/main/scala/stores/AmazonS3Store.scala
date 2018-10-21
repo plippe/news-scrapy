@@ -18,8 +18,8 @@ class AmazonS3Store[F[_]](client: AmazonS3)(
 
   def write(link: Link.AmazonS3, document: String): F[Link.AmazonS3] =
     F.catchNonFatal {
-      client.putObject(link.uri.getBucket, link.uri.getKey, document)
-    }
-    .map(_ => link)
+        client.putObject(link.uri.getBucket, link.uri.getKey, document)
+      }
+      .map(_ => link)
 
 }

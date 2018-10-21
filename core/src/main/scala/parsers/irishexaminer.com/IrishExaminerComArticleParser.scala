@@ -5,8 +5,8 @@ import org.jsoup.Jsoup
 
 import collection.JavaConverters._
 
-class IrishExaminerComArticleParser [F[_]: Applicative]()
-  extends Parser[F, String] {
+class IrishExaminerComArticleParser[F[_]: Applicative]()
+    extends Parser[F, String] {
 
   def parse(content: String): F[String] = {
     val text = Jsoup
