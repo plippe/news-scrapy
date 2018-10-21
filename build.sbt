@@ -3,7 +3,10 @@ lazy val commonSettings = Seq(
     scalaVersion := "2.12.7",
     scalafmtOnCompile := true,
 
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+    libraryDependencies ++= Seq(
+        "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+        "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
+    )
 )
 
 lazy val core = project
