@@ -1,19 +1,16 @@
 package com.github.plippe.news.scrapy.stores
 
-import fs2.Stream
 import org.http4s.client.Client
 import org.http4s.Request
+import cats.effect.Sync
 
 import com.github.plippe.news.scrapy.models.Link
 
-class HttpStore[F[_]](client: Client[F]) extends Reader[F, Link.Http] {
+class HttpStore[F[_]: Sync](client: Client[F]) extends Reader[F, Link.Http] {
 
-  def read(link: Link.Http): Stream[F, String] = {
+  def read(link: Link.Http): F[String] = {
     val req = Request[F](uri = link.uri)
-    client
-      .stream(req)
-      .flatMap(_.bodyAsText)
-      .reduce(_ + _)
+    client.expect[String](req)
   }
 
 }

@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext
 import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
 import com.github.plippe.news.scrapy.parsers._
+import com.github.plippe.news.scrapy.syntax._
 
 object IrishExaminerCom {
 
@@ -22,29 +23,33 @@ object IrishExaminerCom {
     _ = println("Read irishexaminer.com from HTTP")
     articleListHttpUri = Uri.uri("https://www.irishexaminer.com")
     articleListHttpLink = Link.Http(articleListHttpUri)
-    articleListHttp <- httpStore.read(articleListHttpLink)
+    articleListHttp <- httpStore.read(articleListHttpLink).stream
 
     _ = println("Write irishexaminer.com to Amazon S3")
     articleListAmazonS3Uri = new AmazonS3URI(
       s"s3://plippe-us-east-1/irishexaminer.com/news/index.html")
     articleListAmazonS3Link = Link.AmazonS3(articleListAmazonS3Uri)
-    _ <- amazonS3Store.write(articleListAmazonS3Link, articleListHttp)
+    _ <- amazonS3Store.write(articleListAmazonS3Link, articleListHttp).stream
 
     _ = println("Parse irishexaminer.com for URIs")
-    articleHttpUri <- new IrishExaminerComArticleListParser[F]().parse(articleListHttp)
+    articleHttpUri <- new IrishExaminerComArticleListParser[F]()
+      .parse(articleListHttp)
+      .stream
+      .flatMap { uris => Stream.apply(uris: _*) }
+
     articleHttpLink = Link.Http(articleHttpUri)
 
     _ = println(s"Read ${articleHttpUri} from HTTP")
-    articleHttp <- httpStore.read(articleHttpLink)
+    articleHttp <- httpStore.read(articleHttpLink).stream
 
     _ = println(s"Write ${articleHttpUri} to Amazon S3")
     articleAmazonS3Uri = new AmazonS3URI(
       s"s3://plippe-us-east-1/irishexaminer.com${articleHttpUri.path}")
     articleAmazonS3Link = Link.AmazonS3(articleAmazonS3Uri)
-    _ <- amazonS3Store.write(articleAmazonS3Link, articleHttp)
+    _ <- amazonS3Store.write(articleAmazonS3Link, articleHttp).stream
 
     _ = println(s"Parse ${articleHttpUri}")
-    document <- new IrishExaminerComArticleParser[F]().parse(articleHttp)
+    document <- new IrishExaminerComArticleParser[F]().parse(articleHttp).stream
 
     _ = println(s"Done ${articleHttpUri}")
   } yield ()

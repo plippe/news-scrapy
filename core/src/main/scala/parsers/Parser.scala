@@ -1,7 +1,5 @@
 package com.github.plippe.news.scrapy.parsers
 
-import fs2.Stream
-
-trait Parser[F[_], T] {
-  def parse(content: String): Stream[F, T]
+trait Parser[F[_], A] {
+  def parse(content: String): F[A]
 }

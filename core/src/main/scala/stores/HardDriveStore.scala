@@ -1,7 +1,6 @@
 package com.github.plippe.news.scrapy.stores
 
 import cats.ApplicativeError
-import fs2.Stream
 import java.io.{File, PrintWriter}
 
 import scala.io.Source
@@ -11,23 +10,20 @@ class HardDriveStore[F[_]](implicit F: ApplicativeError[F, Throwable])
     extends Reader[F, Link.HardDrive]
     with Writer[F, Link.HardDrive] {
 
-  def read(link: Link.HardDrive): Stream[F, String] = Stream.eval {
+  def read(link: Link.HardDrive): F[String] =
     F.catchNonFatal {
       Source.fromFile(link.path).getLines.mkString("\n")
     }
-  }
 
-  def write(link: Link.HardDrive, document: String): Stream[F, Link.HardDrive] =
-    Stream.eval {
-      F.catchNonFatal {
+  def write(link: Link.HardDrive, document: String): F[Link.HardDrive] =
+    F.catchNonFatal {
 
-        new File(new File(link.path).getParent()).mkdirs()
-        val writer = new PrintWriter(new File(link.path))
-        writer.write(document)
-        writer.close()
+      new File(new File(link.path).getParent()).mkdirs()
+      val writer = new PrintWriter(new File(link.path))
+      writer.write(document)
+      writer.close()
 
-        link
-      }
+      link
     }
 
 }
