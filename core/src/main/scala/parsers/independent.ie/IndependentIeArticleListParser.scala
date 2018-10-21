@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 class IndependentIeArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
     extends Parser[F, List[Uri]] {
 
-  def parse(content: String): F[List[Uri]] = {
+  def parse(content: String): F[List[Uri]] =
     Jsoup
       .parse(content)
       .select("article a[href]")
@@ -24,6 +24,5 @@ class IndependentIeArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
 
         ApplicativeError[F, Throwable].fromEither(uri)
       }
-  }
 
 }

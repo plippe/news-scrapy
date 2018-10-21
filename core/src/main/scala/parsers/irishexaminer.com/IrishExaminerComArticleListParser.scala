@@ -12,11 +12,11 @@ class IrishExaminerComArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]
 
   val baseUrl = "https://www.irishexaminer.com"
 
-  def parse(content: String): F[List[Uri]] = {
+  def parse(content: String): F[List[Uri]] =
     Jsoup
       .parse(content)
       .select(".additional-block-dashboard a[href]")
-      .eachAttr("abs:href")
+      .eachAttr("href")
       .asScala
       .toList
       .map(relativeUrl => baseUrl + relativeUrl)
@@ -28,6 +28,5 @@ class IrishExaminerComArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]
 
         ApplicativeError[F, Throwable].fromEither(uri)
       }
-  }
 
 }
