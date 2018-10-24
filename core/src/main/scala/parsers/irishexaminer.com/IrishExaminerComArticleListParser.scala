@@ -1,32 +1,31 @@
 package com.github.plippe.news.scrapy.parsers
 
 import cats.ApplicativeError
-import cats.implicits._
 import org.http4s.Uri
-import org.jsoup.Jsoup
 
-import scala.collection.JavaConverters._
+class IrishExaminerComArticleListParser[F[_]]()(
+    implicit val F: ApplicativeError[F, Throwable])
+    extends UriListParser[F] {
 
-class IrishExaminerComArticleListParser[F[_]: ApplicativeError[?[_], Throwable]]()
-    extends Parser[F, List[Uri]] {
+  val baseUri = Uri.uri("https://www.irishexaminer.com/")
+  def validUri(uri: Uri): Boolean = {
+    uri.toString.startsWith(baseUri.toString) &&
+    uri.toString.endsWith(".html") &&
+    !ignoredUris.contains(uri) &&
+    !uri.toString.containsSlice("/maintopics/")
+  }
 
-  val baseUrl = "https://www.irishexaminer.com"
-
-  def parse(content: String): F[List[Uri]] =
-    Jsoup
-      .parse(content)
-      .select(".additional-block-dashboard a[href]")
-      .eachAttr("href")
-      .asScala
-      .toList
-      .map(relativeUrl => baseUrl + relativeUrl)
-      .traverse { str =>
-        val uri = Uri
-          .fromString(str)
-          .left
-          .map(err => new Throwable(err.sanitized))
-
-        ApplicativeError[F, Throwable].fromEither(uri)
-      }
+  val ignoredUris = List(
+    "https://www.irishexaminer.com/breakingnews/ireland/postal-delivery-enquiry-form-830443.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/help-830450.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/contact-details-830449.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/cookies-and-how-they-benefit-you-830435.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/FAQ-830933.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/media-pack-830446.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/confidentiality-and-privacy-policy-830432.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/syndication-830438.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/subscriptions-830926.html",
+    "https://www.irishexaminer.com/breakingnews/ireland/terms-and-conditions-of-use-830447.html",
+  ).map(Uri.unsafeFromString)
 
 }
