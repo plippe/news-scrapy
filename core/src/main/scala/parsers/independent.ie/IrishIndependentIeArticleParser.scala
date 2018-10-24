@@ -5,7 +5,7 @@ import org.jsoup.Jsoup
 
 import collection.JavaConverters._
 
-class IndependentIeArticleParser[F[_]: Applicative]()
+class IndependentIeArticleParser[F[_]]()(implicit val F: Applicative[F])
     extends Parser[F, String] {
 
   def parse(content: String): F[String] = {

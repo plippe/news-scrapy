@@ -5,7 +5,7 @@ import org.jsoup.Jsoup
 
 import collection.JavaConverters._
 
-class IrishExaminerComArticleParser[F[_]: Applicative]()
+class IrishExaminerComArticleParser[F[_]]()(implicit val F: Applicative[F])
     extends Parser[F, String] {
 
   def parse(content: String): F[String] = {
