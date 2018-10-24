@@ -23,13 +23,13 @@ object IndependentIe {
         AmazonS3ClientBuilder.defaultClient())
 
       _ = println("Read independent.ie from HTTP")
-      articleListHttpUri = Uri.uri("https://www.independent.ie/news/")
+      articleListHttpUri = Uri.uri("https://www.independent.ie")
       articleListHttpLink = Link.Http(articleListHttpUri)
       articleListHttp <- httpStore.read(articleListHttpLink).stream
 
       _ = println("Write independent.ie to Amazon S3")
       articleListAmazonS3Uri = new AmazonS3URI(
-        s"s3://plippe-us-east-1/independent.ie/news/index.html")
+        s"s3://plippe-us-east-1/independent.ie/index.html")
       articleListAmazonS3Link = Link.AmazonS3(articleListAmazonS3Uri)
       _ <- amazonS3Store.write(articleListAmazonS3Link, articleListHttp).stream
 
