@@ -16,7 +16,8 @@ class HardDriveStoreSpec extends FunSuite with Checkers {
       val result = store.read(Link.HardDrive(path))
 
       assert(result.isLeft)
-      assert(result.left.get.getMessage == s"${path} (No such file or directory)")
+      assert(
+        result.left.get.getMessage == s"${path} (No such file or directory)")
       true
     }
   }

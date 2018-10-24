@@ -4,7 +4,9 @@ import cats.implicits._
 import org.http4s.Uri
 import org.scalatest._
 
-class IrishExaminerComArticleListParserSpec extends FunSuite with ParserSpecHelper {
+class IrishExaminerComArticleListParserSpec
+    extends FunSuite
+    with ParserSpecHelper {
 
   test("IrishExaminerComArticleListParser should return all uris in html file") {
     val expected = Seq(

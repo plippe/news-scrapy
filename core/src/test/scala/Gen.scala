@@ -10,9 +10,18 @@ object Gen {
   lazy val uriGen: OfficialGen[Uri] = for {
     transferProtocol <- OfficialGen.oneOf("http", "https")
     label <- OfficialGen.alphaStr.suchThat(!_.isEmpty)
-    topLevelDomain <- OfficialGen.oneOf("ie", "com", "net", "org", "info", "biz", "eu", "co.uk")
+    topLevelDomain <- OfficialGen.oneOf("ie",
+                                        "com",
+                                        "net",
+                                        "org",
+                                        "info",
+                                        "biz",
+                                        "eu",
+                                        "co.uk")
     path <- OfficialGen.alphaStr
-  } yield Uri.unsafeFromString(s"${transferProtocol}://${label}.${topLevelDomain}/${path}")
+  } yield
+    Uri.unsafeFromString(
+      s"${transferProtocol}://${label}.${topLevelDomain}/${path}")
 
   implicit val arbitraryAmazonS3UriGen = Arbitrary(amazonS3UriGen)
   lazy val amazonS3UriGen: OfficialGen[AmazonS3URI] = for {

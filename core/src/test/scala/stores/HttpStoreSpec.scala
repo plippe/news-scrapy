@@ -14,10 +14,11 @@ class HttpStoreSpec extends FunSuite with Checkers {
   test("HttpStore should read the appropriete uri") {
     check { (uri: Uri, content: String) =>
       val client = new Http4sClientMock[IO] {
-          override def expect[A](req: Request[IO])(implicit d: EntityDecoder[IO,A]): IO[A] = {
-            assert(uri == req.uri)
-            IO.pure(content.asInstanceOf[A])
-          }
+        override def expect[A](req: Request[IO])(
+            implicit d: EntityDecoder[IO, A]): IO[A] = {
+          assert(uri == req.uri)
+          IO.pure(content.asInstanceOf[A])
+        }
       }
 
       val store = new HttpStore(client)

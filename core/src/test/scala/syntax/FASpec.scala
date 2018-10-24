@@ -9,12 +9,12 @@ class FASpec extends FunSuite with Checkers {
 
   test("SyntaxFA should convert an F[A] to a Stream[F, A]") {
     check { (a: Int) =>
-        val fa: IO[Int] = IO(a)
-        val sa: Stream[IO, Int] = new SyntaxFA(fa).stream
-        val la: List[Int] = sa.compile.toList.unsafeRunSync
+      val fa: IO[Int] = IO(a)
+      val sa: Stream[IO, Int] = new SyntaxFA(fa).stream
+      val la: List[Int] = sa.compile.toList.unsafeRunSync
 
-        assert(a == la.head)
-        true
+      assert(a == la.head)
+      true
     }
   }
 
