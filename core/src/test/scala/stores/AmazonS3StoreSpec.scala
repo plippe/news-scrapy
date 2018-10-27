@@ -3,16 +3,16 @@ package com.github.plippe.news.scrapy.stores
 import cats.effect.IO
 import com.amazonaws.services.s3.AmazonS3URI
 import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
+import org.scalatest.prop.PropertyChecks
 
 import com.github.plippe.news.scrapy.Gen._
 import com.github.plippe.news.scrapy.mocks.AmazonS3Mock
 import com.github.plippe.news.scrapy.models.Link
 
-class AmazonS3StoreSpec extends FunSuite with Checkers {
+class AmazonS3StoreSpec extends FunSuite with PropertyChecks {
 
   test("AmazonS3StoreSpec should read the appropriete Amazon S3 object") {
-    check { (uri: AmazonS3URI, content: String) =>
+    forAll { (uri: AmazonS3URI, content: String) =>
       val client = new AmazonS3Mock {
         override def getObjectAsString(bucket: String, key: String) = {
           assert(uri.getBucket == bucket)
@@ -25,12 +25,11 @@ class AmazonS3StoreSpec extends FunSuite with Checkers {
       val result = store.read(Link.AmazonS3(uri)).unsafeRunSync
 
       assert(content == result)
-      true
     }
   }
 
   test("AmazonS3StoreSpec should write the appropriete Amazon S3 object") {
-    check { (uri: AmazonS3URI, content: String) =>
+    forAll { (uri: AmazonS3URI, content: String) =>
       val client = new AmazonS3Mock {
         override def putObject(bucket: String, key: String, str: String) = {
           assert(uri.getBucket == bucket)
@@ -45,7 +44,6 @@ class AmazonS3StoreSpec extends FunSuite with Checkers {
       val result = store.write(link, content).unsafeRunSync
 
       assert(link == result)
-      true
     }
   }
 
