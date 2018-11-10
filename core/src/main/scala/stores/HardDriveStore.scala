@@ -7,8 +7,8 @@ import scala.io.Source
 import com.github.plippe.news.scrapy.models.Link
 
 class HardDriveStore[F[_]](implicit F: ApplicativeError[F, Throwable])
-    extends Reader[F, Link.HardDrive]
-    with Writer[F, Link.HardDrive] {
+    extends Reader[F, Link.HardDrive, String]
+    with Writer[F, Link.HardDrive, String] {
 
   def read(link: Link.HardDrive): F[String] =
     F.catchNonFatal {

@@ -7,19 +7,19 @@ import org.jsoup.Jsoup
 
 import scala.collection.JavaConverters._
 
-trait Parser[F[_], A] {
-  def parse(content: String): F[A]
+trait Parser[F[_], D, A] {
+  def parse(document: D): F[A]
 }
 
-trait UriListParser[F[_]] extends Parser[F, List[Uri]] {
+trait UriListParser[F[_]] extends Parser[F, String, List[Uri]] {
   implicit val F: ApplicativeError[F, Throwable]
 
   def baseUri: Uri
   def validUri(uri: Uri): Boolean
 
-  def parse(content: String): F[List[Uri]] =
+  def parse(document: String): F[List[Uri]] =
     Jsoup
-      .parse(content, baseUri.toString)
+      .parse(document, baseUri.toString)
       .select("a[href]")
       .eachAttr("abs:href")
       .asScala

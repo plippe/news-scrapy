@@ -8,8 +8,8 @@ import com.github.plippe.news.scrapy.models.Link
 
 class AmazonS3Store[F[_]](client: AmazonS3)(
     implicit F: ApplicativeError[F, Throwable])
-    extends Reader[F, Link.AmazonS3]
-    with Writer[F, Link.AmazonS3] {
+    extends Reader[F, Link.AmazonS3, String]
+    with Writer[F, Link.AmazonS3, String] {
 
   def read(link: Link.AmazonS3): F[String] =
     F.catchNonFatal {
