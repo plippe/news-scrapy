@@ -36,7 +36,7 @@ abstract class Generic[F[_]: ConcurrentEffect] {
 
       _ = println(s"Parse ${articleListUri} for URIs")
       articleUri <- articleListParser
-        .parse(articleListWebPage.html)
+        .parse(articleListWebPage)
         .stream
         .flatMap { uris =>
           Stream.apply(uris: _*)
@@ -49,7 +49,7 @@ abstract class Generic[F[_]: ConcurrentEffect] {
       _ <- webPageWriter.write(articleWebPage).stream
 
       _ = println(s"Parse ${articleUri}")
-      article <- articleParser.parse(articleWebPage.html).stream
+      article <- articleParser.parse(articleWebPage).stream
 
       _ = println(s"Done ${article}")
     } yield ()

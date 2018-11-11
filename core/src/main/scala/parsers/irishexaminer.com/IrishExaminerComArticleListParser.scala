@@ -7,9 +7,8 @@ class IrishExaminerComArticleListParser[F[_]]()(
     implicit val F: ApplicativeError[F, Throwable])
     extends UriListParser[F] {
 
-  val baseUri = Uri.uri("https://www.irishexaminer.com/")
   def validUri(uri: Uri): Boolean = {
-    uri.toString.startsWith(baseUri.toString) &&
+    uri.toString.startsWith("https://www.irishexaminer.com/") &&
     uri.toString.endsWith(".html") &&
     !ignoredUris.contains(uri) &&
     !uri.toString.containsSlice("/maintopics/")

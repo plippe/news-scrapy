@@ -4,22 +4,22 @@ import cats.ApplicativeError
 import cats.implicits._
 import org.http4s.Uri
 import org.jsoup.Jsoup
-
 import scala.collection.JavaConverters._
 
-trait Parser[F[_], D, A] {
-  def parse(document: D): F[A]
+import com.github.plippe.news.scrapy.models.WebPage
+
+trait Parser[F[_], A] {
+  def parse(webPage: WebPage): F[A]
 }
 
-trait UriListParser[F[_]] extends Parser[F, String, List[Uri]] {
-  implicit val F: ApplicativeError[F, Throwable]
+abstract class UriListParser[F[_]: ApplicativeError[?[_], Throwable]]
+    extends Parser[F, List[Uri]] {
 
-  def baseUri: Uri
   def validUri(uri: Uri): Boolean
 
-  def parse(document: String): F[List[Uri]] =
+  def parse(webPage: WebPage): F[List[Uri]] =
     Jsoup
-      .parse(document, baseUri.toString)
+      .parse(webPage.html, webPage.uri.toString)
       .select("a[href]")
       .eachAttr("abs:href")
       .asScala
@@ -31,7 +31,7 @@ trait UriListParser[F[_]] extends Parser[F, String, List[Uri]] {
           .left
           .map(err => new Throwable(err.sanitized))
 
-        F.fromEither(uri)
+        ApplicativeError[F, Throwable].fromEither(uri)
       }
       .map(_.filter(validUri))
 
