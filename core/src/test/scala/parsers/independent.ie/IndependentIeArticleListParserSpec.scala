@@ -165,6 +165,7 @@ class IndependentIeArticleListParserSpec
 
     val parsed = parse(
       new IndependentIeArticleListParser(),
+      Uri.uri("http://example.com/"),
       "parsers/independent.ie/index.html"
     )
 

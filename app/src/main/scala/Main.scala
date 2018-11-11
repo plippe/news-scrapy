@@ -35,7 +35,7 @@ object Main extends App {
 
       _ = println(s"Parse ${articleListUri} for URIs")
       articleUri <- articleListParser
-        .parse(articleListWebPage.html)
+        .parse(articleListWebPage)
         .stream
         .flatMap { uris =>
           Stream.apply(uris: _*)
@@ -48,7 +48,7 @@ object Main extends App {
       _ <- webPageWriter.write(articleWebPage).stream
 
       _ = println(s"Parse ${articleUri}")
-      article <- articleParser.parse(articleWebPage.html).stream
+      article <- articleParser.parse(articleWebPage).stream
 
       _ = println(s"Done ${article}")
     } yield ()
