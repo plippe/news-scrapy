@@ -12,23 +12,21 @@ import com.github.plippe.news.scrapy.stores._
 import com.github.plippe.news.scrapy.parsers._
 import com.github.plippe.news.scrapy.syntax._
 
-object IndependentIe {
+abstract class Generic[F[_]: ConcurrentEffect] {
 
-  def stream[F[_]: ConcurrentEffect]()(
-      implicit ec: ExecutionContext): Stream[F, Unit] =
+  val articleListUri: Uri
+  val articleListParser: UriListParser[F]
+  val articleParser: Parser[F, String, String]
+
+  def stream()(implicit ec: ExecutionContext): Stream[F, Unit] =
     for {
       client <- BlazeClientBuilder[F](ec).stream
-
-      articleListParser = new IndependentIeArticleListParser[F]()
-      articleParser = new IndependentIeArticleParser[F]()
 
       webPageReader: WebPageReader[F] = new WebPageHttpStore[F](client)
       webPageWriter: WebPageWriter[F] = new WebPageAwsS3Store[F](
         AmazonS3ClientBuilder.defaultClient(),
         AwsS3Uri("plippe-us-east-1", "news-scrapy")
       )
-
-      articleListUri = Uri.uri("https://www.independent.ie")
 
       _ = println(s"Read ${articleListUri} from HTTP")
       articleListWebPage <- webPageReader.read(articleListUri).stream
@@ -56,4 +54,26 @@ object IndependentIe {
       _ = println(s"Done ${article}")
     } yield ()
 
+}
+
+object IndependentIe {
+  def stream[F[_]: ConcurrentEffect]()(implicit ec: ExecutionContext) =
+    new Generic[F] {
+      val articleListUri = Uri.uri("https://www.independent.ie")
+      val articleListParser: UriListParser[F] =
+        new IndependentIeArticleListParser[F]()
+      val articleParser: Parser[F, String, String] =
+        new IndependentIeArticleParser[F]()
+    }.stream
+}
+
+object IrishExaminerCom {
+  def stream[F[_]: ConcurrentEffect]()(implicit ec: ExecutionContext) =
+    new Generic[F] {
+      val articleListUri = Uri.uri("https://www.irishexaminer.com")
+      val articleListParser: UriListParser[F] =
+        new IrishExaminerComArticleListParser[F]()
+      val articleParser: Parser[F, String, String] =
+        new IrishExaminerComArticleParser[F]()
+    }.stream
 }
