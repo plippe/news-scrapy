@@ -16,7 +16,7 @@ abstract class Generic[F[_]: ConcurrentEffect] {
 
   val articleListUri: Uri
   val articleListParser: UriListParser[F]
-  val articleParser: Parser[F, String, String]
+  val articleParser: Parser[F, Article]
 
   def stream()(implicit ec: ExecutionContext): Stream[F, Unit] =
     for {
@@ -62,7 +62,7 @@ object IndependentIe {
       val articleListUri = Uri.uri("https://www.independent.ie")
       val articleListParser: UriListParser[F] =
         new IndependentIeArticleListParser[F]()
-      val articleParser: Parser[F, String, String] =
+      val articleParser: Parser[F, Article] =
         new IndependentIeArticleParser[F]()
     }.stream
 }
@@ -73,7 +73,7 @@ object IrishExaminerCom {
       val articleListUri = Uri.uri("https://www.irishexaminer.com")
       val articleListParser: UriListParser[F] =
         new IrishExaminerComArticleListParser[F]()
-      val articleParser: Parser[F, String, String] =
+      val articleParser: Parser[F, Article] =
         new IrishExaminerComArticleParser[F]()
     }.stream
 }
