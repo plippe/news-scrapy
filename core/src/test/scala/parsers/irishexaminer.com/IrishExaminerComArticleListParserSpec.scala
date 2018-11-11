@@ -87,7 +87,7 @@ class IrishExaminerComArticleListParserSpec
 
     val parsed = parse(
       new IrishExaminerComArticleListParser(),
-      Uri.uri("http://example.com/"),
+      Uri.uri("https://www.irishexaminer.com/"),
       "parsers/irishexaminer.com/index.html"
     )
 
