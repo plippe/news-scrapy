@@ -4,21 +4,19 @@ import cats.Applicative
 import java.time.{ZonedDateTime, ZoneId}
 import java.time.format.DateTimeFormatterBuilder
 import java.util.Locale
-import java.time.ZonedDateTime
 import org.jsoup.Jsoup
 import collection.JavaConverters._
 import scala.util.Try
 
 import com.github.plippe.news.scrapy.models.{Article, WebPage}
 
-class IrishExaminerComArticleParser[F[_]: Applicative]()
+class IndependentIeArticleParser[F[_]: Applicative]()
     extends Parser[F, Article] {
 
   def parse(webPage: WebPage): F[Article] = {
     val html = Jsoup.parse(webPage.html)
-
     val body = html
-      .select(".ctx_content")
+      .select(".body")
       .eachText()
       .asScala
       .mkString
@@ -26,18 +24,17 @@ class IrishExaminerComArticleParser[F[_]: Applicative]()
     val publishedAt = {
       val format = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
-        .appendPattern("EEEE, MMMM d, yyyy - hh:m a")
+        .appendPattern("MMMM d yyyy h:m a")
         .toFormatter()
         .withLocale(Locale.forLanguageTag("EN"))
         .withZone(ZoneId.of("Europe/Dublin"))
 
-      Option(html.selectFirst(".byline"))
+      Option(html.selectFirst("time"))
         .map(_.text())
         .flatMap { time =>
           Try(ZonedDateTime.parse(time, format)).toOption
             .orElse {
-              println(
-                s"IrishExaminerComArticleParser failed to parse '${time}'")
+              println(s"IndependentIeArticleParser failed to parse '${time}'")
               None
             }
         }
@@ -45,6 +42,7 @@ class IrishExaminerComArticleParser[F[_]: Applicative]()
     }
 
     Applicative[F].pure(Article(body, webPage.uri, publishedAt))
+
   }
 
 }
