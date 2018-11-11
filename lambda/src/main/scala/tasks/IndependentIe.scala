@@ -1,12 +1,13 @@
 package com.github.plippe.news.scrapy.tasks
 
 import cats.effect.ConcurrentEffect
-import com.amazonaws.services.s3.{AmazonS3ClientBuilder, AmazonS3URI}
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import fs2.Stream
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.Uri
 import scala.concurrent.ExecutionContext
 
+import com.github.plippe.news.scrapy.models._
 import com.github.plippe.news.scrapy.stores._
 import com.github.plippe.news.scrapy.parsers._
 import com.github.plippe.news.scrapy.syntax._
@@ -24,7 +25,7 @@ object IndependentIe {
       webPageReader: WebPageReader[F] = new WebPageHttpStore[F](client)
       webPageWriter: WebPageWriter[F] = new WebPageAwsS3Store[F](
         AmazonS3ClientBuilder.defaultClient(),
-        new AmazonS3URI("s3://plippe-us-east-1/news-scrapy")
+        AwsS3Uri("plippe-us-east-1", "news-scrapy")
       )
 
       articleListUri = Uri.uri("https://www.independent.ie")
