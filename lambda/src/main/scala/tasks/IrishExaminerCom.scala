@@ -7,7 +7,6 @@ import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.Uri
 import scala.concurrent.ExecutionContext
 
-import com.github.plippe.news.scrapy.models.Link
 import com.github.plippe.news.scrapy.stores._
 import com.github.plippe.news.scrapy.parsers._
 import com.github.plippe.news.scrapy.syntax._
@@ -18,46 +17,42 @@ object IrishExaminerCom {
       implicit ec: ExecutionContext): Stream[F, Unit] =
     for {
       client <- BlazeClientBuilder[F](ec).stream
-      httpStore = new HttpStore[F](client)
-      amazonS3Store = new AmazonS3Store[F](
-        AmazonS3ClientBuilder.defaultClient())
 
-      _ = println("Read irishexaminer.com from HTTP")
-      articleListHttpUri = Uri.uri("https://www.irishexaminer.com")
-      articleListHttpLink = Link.Http(articleListHttpUri)
-      articleListHttp <- httpStore.read(articleListHttpLink).stream
+      articleListParser = new IrishExaminerComArticleListParser[F]()
+      articleParser = new IrishExaminerComArticleParser[F]()
 
-      _ = println("Write irishexaminer.com to Amazon S3")
-      articleListAmazonS3Uri = new AmazonS3URI(
-        s"s3://plippe-us-east-1/irishexaminer.com/news/index.html")
-      articleListAmazonS3Link = Link.AmazonS3(articleListAmazonS3Uri)
-      _ <- amazonS3Store.write(articleListAmazonS3Link, articleListHttp).stream
+      webPageReader: WebPageReader[F] = new WebPageHttpStore[F](client)
+      webPageWriter: WebPageWriter[F] = new WebPageAwsS3Store[F](
+        AmazonS3ClientBuilder.defaultClient(),
+        new AmazonS3URI("s3://plippe-us-east-1/news-scrapy")
+      )
 
-      _ = println("Parse irishexaminer.com for URIs")
-      articleHttpUri <- new IrishExaminerComArticleListParser[F]()
-        .parse(articleListHttp)
+      articleListUri = Uri.uri("https://www.irishexaminer.com")
+
+      _ = println(s"Read ${articleListUri} from HTTP")
+      articleListWebPage <- webPageReader.read(articleListUri).stream
+
+      _ = println(s"Write ${articleListUri} to Amazon S3")
+      _ <- webPageWriter.write(articleListWebPage).stream
+
+      _ = println(s"Parse ${articleListUri} for URIs")
+      articleUri <- articleListParser
+        .parse(articleListWebPage.html)
         .stream
         .flatMap { uris =>
           Stream.apply(uris: _*)
         }
 
-      articleHttpLink = Link.Http(articleHttpUri)
+      _ = println(s"Read ${articleUri} from HTTP")
+      articleWebPage <- webPageReader.read(articleUri).stream
 
-      _ = println(s"Read ${articleHttpUri} from HTTP")
-      articleHttp <- httpStore.read(articleHttpLink).stream
+      _ = println(s"Write ${articleUri} to Amazon S3")
+      _ <- webPageWriter.write(articleWebPage).stream
 
-      _ = println(s"Write ${articleHttpUri} to Amazon S3")
-      articleAmazonS3Uri = new AmazonS3URI(
-        s"s3://plippe-us-east-1/irishexaminer.com${articleHttpUri.path}")
-      articleAmazonS3Link = Link.AmazonS3(articleAmazonS3Uri)
-      _ <- amazonS3Store.write(articleAmazonS3Link, articleHttp).stream
+      _ = println(s"Parse ${articleUri}")
+      article <- articleParser.parse(articleWebPage.html).stream
 
-      _ = println(s"Parse ${articleHttpUri}")
-      document <- new IrishExaminerComArticleParser[F]()
-        .parse(articleHttp)
-        .stream
-
-      _ = println(s"Done ${articleHttpUri}")
+      _ = println(s"Done ${article}")
     } yield ()
 
 }
